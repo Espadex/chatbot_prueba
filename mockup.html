@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App Project</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <div class="app-wrapper">
+
+        <!-- Sidebar-->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-title">
+                    <span>Chat Mockup</span>
+                    <span class="badge">Practice</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle">
+                    ☾ / ☀
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" class="search-input" placeholder="Search (visual only)..." id="searchInput" />
+            </div>
+            <div class="chat-list" id="chatList"></div>
+        </aside>
+
+        <!-- Main Chat -->
+        <main class="chat-main">
+            <header class="chat-header">
+                <div class="chat-header-main">
+                    <div class="avatar" id="activeAvatar">AL</div>
+                    <div class="chat-header-text">
+                        <div class="chat-header-name" id="activeName">
+                            Alice (Demo)
+                        </div>
+                        <div class="chat-header-status" id="activeStatus">
+                            Online • Practicing JS
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-header-right">
+                    <span class="pill" id="activeMeta">Mock data only</span>
+                    <span style="font-size: 0.8rem;">No backend 🚫</span>
+                </div>
+            </header>
+
+            <section class="messages" id="messages"></section>
+
+            <section class="chat-input-area">
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="messageInput"
+                        placeholder="Type a message and press Enter…" />
+                </div>
+                <button class="send-btn" id="sendBtn">
+                    <span class="icon">➤</span>
+                    <span>Send</span>
+                </button>
+            </section>
+        </main>
+    </div>
+
+</body>
+
+</html>

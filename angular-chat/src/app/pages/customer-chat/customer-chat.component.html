@@ -1,0 +1,73 @@
+<div class="app-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="app-title">
+                <span>Chat Mockup</span>
+                <span class="badge">Practice</span>
+            </div>
+            <button class="theme-toggle" (click)="toggleTheme()">
+                ☾ / ☀
+            </button>
+        </div>
+        <div class="sidebar-search">
+            <input type="text" class="search-input" placeholder="Search (visual only)..." />
+        </div>
+        <div class="chat-list">
+            <div *ngFor="let conv of conversations" class="chat-item" [class.active]="conv.id === activeConversationId"
+                (click)="selectConversation(conv.id)">
+                <div class="avatar">{{ conv.initials }}</div>
+                <div class="chat-item-text">
+                    <div class="chat-name">{{ conv.name }}</div>
+                    <div class="chat-last-msg">
+                        {{ conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].text : 'No messages yet'
+                        }}
+                    </div>
+                </div>
+                <div class="chat-meta">
+                    <div>{{ conv.lastSeen }}</div>
+                    <div *ngIf="conv.unread > 0" class="chat-unread">{{ conv.unread }}</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Chat -->
+    <main class="chat-main" *ngIf="activeConversation as activeConv">
+        <header class="chat-header">
+            <div class="chat-header-main">
+                <div class="avatar">{{ activeConv.initials }}</div>
+                <div class="chat-header-text">
+                    <div class="chat-header-name">{{ activeConv.name }}</div>
+                    <div class="chat-header-status">{{ activeConv.status }}</div>
+                </div>
+            </div>
+            <div class="chat-header-right">
+                <span class="pill">Mock thread: {{ activeConv.id }}</span>
+                <span style="font-size: 0.8rem;">No backend 🚫</span>
+            </div>
+        </header>
+
+        <section class="messages" #scrollContainer>
+            <div class="day-divider">Today</div>
+            <div *ngFor="let msg of activeConv.messages" class="message-row"
+                [ngClass]="msg.from === 'me' ? 'me' : 'them'">
+                <div class="message-bubble">
+                    {{ msg.text }}
+                    <div class="message-meta">{{ msg.time }}</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="chat-input-area">
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Type a message and press Enter…"
+                    [(ngModel)]="messageInput" (keydown.enter)="sendMessage()" />
+            </div>
+            <button class="send-btn" (click)="sendMessage()">
+                <span class="icon">➤</span>
+                <span>Send</span>
+            </button>
+        </section>
+    </main>
+</div>

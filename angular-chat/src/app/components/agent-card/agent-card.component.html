@@ -1,0 +1,28 @@
+<div class="agent-card">
+    <div class="card-header">
+        <div class="agent-icon">
+            <!-- Simple icon placeholder based on name -->
+            <span *ngIf="agent?.id === 'chat-mockup'">💬</span>
+            <span *ngIf="agent?.id !== 'chat-mockup'">🤖</span>
+        </div>
+        <div class="agent-info">
+            <h3>{{ agent?.name }}</h3>
+            <span class="agent-role">{{ agent?.role }}</span>
+        </div>
+    </div>
+
+    <p class="agent-desc">{{ agent?.description }}</p>
+
+    <div class="card-footer">
+        <span class="status-pill" [class.confidential]="agent?.status === 'Confidential'">
+            {{ agent?.status }}
+        </span>
+        <div class="card-actions">
+            <!-- If it has a link, use routerLink -->
+            <a *ngIf="agent?.link" [routerLink]="agent.link" class="btn btn-try">Try</a>
+            <button *ngIf="!agent?.link" class="btn btn-try">Try</button>
+
+            <button class="btn btn-edit">Edit</button>
+        </div>
+    </div>
+</div>

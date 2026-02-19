@@ -1,0 +1,39 @@
+<div class="home-container">
+    <app-top-nav></app-top-nav>
+
+    <main class="main-content">
+
+        <section class="section-agents">
+            <div class="section-header">
+                <h2>Your Agents</h2>
+                <div class="header-actions">
+                    <span class="view-all">View All</span>
+                    <button class="create-btn">Create Agent</button>
+                </div>
+            </div>
+
+            <div class="agents-grid">
+                <!-- Loop through agents -->
+                <app-agent-card *ngFor="let agent of myAgents" [agent]="agent"></app-agent-card>
+            </div>
+        </section>
+
+        <section class="section-find">
+            <div class="section-header">
+                <h2>Find Agents</h2>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active">Favorites</button>
+                <button class="tab">Demo</button>
+            </div>
+
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Search using agent's name, or description..." />
+            </div>
+
+        </section>
+
+    </main>
+</div>
