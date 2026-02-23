@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TopNavComponent } from '../../components/top-nav/top-nav.component';
 import { AgentCardComponent } from '../../components/agent-card/agent-card.component';
 import { Agent } from '../../models/agent';
+import { AgentService } from '../../services/agent.service';
 
 @Component({
   selector: 'app-customer-home',
@@ -12,18 +13,14 @@ import { Agent } from '../../models/agent';
   templateUrl: './customer-home.component.html',
   styleUrl: './customer-home.component.css'
 })
-export class CustomerHomeComponent {
+export class CustomerHomeComponent implements OnInit {
 
-  myAgents: Agent[] = [
-    {
-      id: 'chat-mockup',
-      name: 'Chat Mockup',
-      role: 'practice.user',
-      description: 'The Angular chat interface we just refactored. Click Try to enter.',
-      status: 'Unrestricted',
-      canEdit: true,
-      link: '/chat'
-    }
-  ];
+  myAgents: Agent[] = [];
+
+  constructor(private agentService: AgentService) { }
+
+  ngOnInit() {
+    this.myAgents = this.agentService.getAgents();
+  }
 
 }

@@ -5,4 +5,5 @@ import { CustomerChatComponent } from './pages/customer-chat/customer-chat.compo
 export const routes: Routes = [
     { path: '', component: CustomerHomeComponent },
     { path: 'chat', component: CustomerChatComponent },
+    { path: 'chat/:id', component: CustomerChatComponent },
 ];

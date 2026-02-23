@@ -1,6 +1,9 @@
-import { Component, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewChecked, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { AgentService } from '../../services/agent.service';
+
 
 interface Message {
   from: 'me' | 'them';
@@ -15,6 +18,7 @@ interface Conversation {
   status: string;
   lastSeen: string;
   unread: number;
+  groupId: string; // New field to group chats
   messages: Message[];
 }
 
@@ -25,16 +29,21 @@ interface Conversation {
   templateUrl: './customer-chat.component.html',
   styleUrl: './customer-chat.component.css'
 })
-export class CustomerChatComponent implements AfterViewChecked {
+export class CustomerChatComponent implements AfterViewChecked, OnInit {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   title = 'Chat App Project';
   isLightMode = false;
-  activeConversationId = 'alice';
+  activeConversationId = ''; // Initialize empty, will set based on active group
+  activeGroupId = ''; // Track which group of chats is currently active
   messageInput = '';
   shouldScroll = false;
+  agentName = 'Chat Mockup';
 
-  conversations: Conversation[] = [
+  constructor(private route: ActivatedRoute, private agentService: AgentService) { }
+
+  allConversations: Conversation[] = [
+    // --- GROUP 1 CHATS ---
     {
       id: "alice",
       name: "Alice",
@@ -42,6 +51,7 @@ export class CustomerChatComponent implements AfterViewChecked {
       status: "Online • Practicing JS",
       lastSeen: "Now",
       unread: 2,
+      groupId: "group1",
       messages: [
         { from: "them", text: "Hey! Ready to practice some JS? 😊", time: "10:21" },
         {
@@ -63,6 +73,7 @@ export class CustomerChatComponent implements AfterViewChecked {
       status: "Last seen 2h ago",
       lastSeen: "2h",
       unread: 0,
+      groupId: "group1",
       messages: [
         {
           from: "them",
@@ -83,6 +94,7 @@ export class CustomerChatComponent implements AfterViewChecked {
       status: "Pinned • Personal",
       lastSeen: "Yesterday",
       unread: 3,
+      groupId: "group1",
       messages: [
         {
           from: "me",
@@ -96,7 +108,62 @@ export class CustomerChatComponent implements AfterViewChecked {
         },
       ],
     },
+    // --- GROUP 2 CHATS ---
+    {
+      id: "support",
+      name: "Tech Support",
+      initials: "TS",
+      status: "Online",
+      lastSeen: "Now",
+      unread: 1,
+      groupId: "group2",
+      messages: [
+        { from: "them", text: "How can I help you today?", time: "09:00" },
+      ],
+    },
+    {
+      id: "billing",
+      name: "Billing Dept",
+      initials: "BD",
+      status: "Away",
+      lastSeen: "1h",
+      unread: 0,
+      groupId: "group2",
+      messages: [
+        { from: "me", text: "I have a question about my invoice.", time: "14:20" },
+        { from: "them", text: "Sure, what's your account number?", time: "14:25" },
+      ],
+    },
   ];
+
+  get conversations(): Conversation[] {
+    return this.allConversations.filter(c => c.groupId === this.activeGroupId);
+  }
+
+  ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.activeGroupId = id;
+
+        // Select the first conversation in the group by default
+        const groupConversations = this.conversations;
+        if (groupConversations.length > 0) {
+          this.selectConversation(groupConversations[0].id);
+        } else {
+          this.activeConversationId = '';
+        }
+
+        // Dynamically get the agent name from the shared service
+        const agent = this.agentService.getAgents().find(a => a.link === `/chat/${id}`);
+        if (agent) {
+          this.agentName = agent.name;
+        } else {
+          this.agentName = 'Chat Mockup';
+        }
+      }
+    });
+  }
 
   ngAfterViewChecked() {
     if (this.shouldScroll) {
@@ -106,7 +173,7 @@ export class CustomerChatComponent implements AfterViewChecked {
   }
 
   get activeConversation(): Conversation | undefined {
-    return this.conversations.find(c => c.id === this.activeConversationId);
+    return this.allConversations.find(c => c.id === this.activeConversationId && c.groupId === this.activeGroupId);
   }
 
   selectConversation(id: string) {
