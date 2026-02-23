@@ -19,10 +19,12 @@ El formato estándar para nombrar ramas es: `<tipo>/<ticket>-<corta-descripcion>
     *   *Uso:* Desarrollo de nuevas características (historias de usuario) para el próximo release. Solo existen en los entornos locales de los desarrolladores y se envían mediante PR a `develop`.
     *   *Ejemplo:* `feature/JIRA-123-login-modal`
 
-2.  **`release/` (Preparación de Versión):**
+2.  **`release/` (Entorno de QA y Preparación de Versión):**
     *   **Nace de:** `develop`
     *   **Se fusiona en:** `main` **Y** `develop`
-    *   *Uso:* Sirve para preparar un nuevo lanzamiento a producción. Permite arreglar bugs menores (congelamiento de código), generar documentación y definir metadatos, sin bloquear a otros desarrolladores que sigan enviando features a `develop` para la versión que le siga.
+    *   *Uso:* Esta rama **funciona como el entorno de QA (Pre-Producción)**. Se crea cuando `develop` ya tiene las características listas para la próxima versión. El equipo de QA asume el control de esta rama para hacer sus pruebas (regresión, funcionales, estrés).
+        *   **Gestión de Bugs:** Si QA encuentra errores, los desarrolladores corrigen y hacen _commits_ de los arreglos (bugfixes) **directamente sobre esta rama `release/`**, sin volver a pasar por `develop` ni crear ramas `feature/`.
+        *   Esto evita bloquear a otros desarrolladores que ya estén trabajando en `develop` para una versión futura. Una vez aprobada por QA, se fusiona hacia `main` (Producción) y de regreso a `develop` (para sincronizar los arreglos encontrados por QA).
     *   *Ejemplo:* `release/v1.0.0`
 
 3.  **`hotfix/` (Correcciones Críticas en Producción):**
