@@ -1,15 +1,16 @@
-import { Component, ViewChild, ElementRef, AfterViewChecked, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewChecked, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AgentService } from '../../services/agent.service';
 import { ChatService } from '../../services/chat.service';
 import { Conversation } from '../../models/conversations';
+import { MarkdownPipe } from '../../pipes/markdown.pipe';
 
 @Component({
   selector: 'app-customer-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, MarkdownPipe],
   templateUrl: './customer-chat.component.html',
   styleUrl: './customer-chat.component.css'
 })
@@ -155,6 +156,26 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
       } catch (err) {
         console.error('Scroll error', err);
+      }
+    }
+  }
+
+  @HostListener('click', ['$event'])
+  onChatClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const copyBtn = target.closest('.copy-btn') as HTMLElement;
+
+    if (copyBtn) {
+      const encodedCode = copyBtn.getAttribute('data-code');
+      if (encodedCode) {
+        const decodedCode = decodeURIComponent(encodedCode);
+        navigator.clipboard.writeText(decodedCode).then(() => {
+          const originalHtml = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> <span style="color:#22c55e">Copied!</span>';
+          setTimeout(() => {
+            copyBtn.innerHTML = originalHtml;
+          }, 2000);
+        }).catch(err => console.error('Error copying text: ', err));
       }
     }
   }

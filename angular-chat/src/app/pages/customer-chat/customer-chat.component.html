@@ -60,7 +60,7 @@
             <div *ngFor="let msg of activeConv.messages" class="message-row"
                 [ngClass]="msg.from === 'me' ? 'me' : 'them'">
                 <div class="message-bubble">
-                    {{ msg.text }}
+                    <div [innerHTML]="msg.text | markdown"></div>
                     <div class="message-meta">{{ msg.time }}</div>
                 </div>
             </div>
