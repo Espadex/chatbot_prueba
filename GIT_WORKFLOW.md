@@ -1,8 +1,49 @@
 # Git Workflow: Estándar GitFlow
 
-Este documento define la estrategia de ramas y el flujo de trabajo basándose en el **modelo estándar GitFlow**, ideal para proyectos que tienen ciclos de liberación (releases) programados y necesitan mantener una versión de producción estable mientras se desarrolla la siguiente versión.
+Este documento define la estrategia de ramas y el flujo de trabajo basándose en el **[modelo estándar GitFlow documentado por Atlassian](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)**, ampliamente adoptado en la industria. Es ideal para proyectos que tienen ciclos de liberación (releases) programados y necesitan mantener una versión de producción estable mientras se desarrolla la siguiente versión.
 
 ## 1. Estrategia de Ramas (Branching Strategy)
+
+A continuación, se presenta de forma visual cómo fluye el código entre los distintos entornos y ramas. Puedes visualizar este diagrama en plataformas que soporten **Mermaid** (como GitHub, GitLab, Notion o pegando el código en [Mermaid Live Editor](https://mermaid.live)):
+
+```mermaid
+%%{init: { 'theme': 'base', 'gitGraph': {'mainBranchName': 'main'} } }%%
+gitGraph
+    commit id: "Inicio" tag: "v0.1"
+    
+    branch develop
+    checkout develop
+    commit id: "Configuración inicial"
+
+    branch feature/TKT-123
+    checkout feature/TKT-123
+    commit id: "feat: UI Login"
+    commit id: "feat: Lógica Auth"
+    
+    checkout develop
+    merge feature/TKT-123 id: "Merge a DEV"
+    
+    branch release/v1.0
+    checkout release/v1.0
+    commit id: "fix: bug detectado en QA"
+
+    checkout main
+    merge release/v1.0 tag: "v1.0"
+
+    checkout develop
+    merge release/v1.0 id: "Sync QA a DEV"
+
+    checkout main
+    branch hotfix/crash-prod
+    checkout hotfix/crash-prod
+    commit id: "fix: error crítico en vivo"
+    
+    checkout main
+    merge hotfix/crash-prod tag: "v1.0.1"
+
+    checkout develop
+    merge hotfix/crash-prod id: "Sync Hotfix a DEV"
+```
 
 El repositorio se organiza alrededor de **dos ramas principales permanentes** y **tres tipos de ramas de soporte (efímeras)**.
 
@@ -16,7 +57,8 @@ El formato estándar para nombrar ramas es: `<tipo>/<ticket>-<corta-descripcion>
 1.  **`feature/` (Nuevas Funcionalidades):**
     *   **Nace de:** `develop`
     *   **Se fusiona en:** `develop`
-    *   *Uso:* Desarrollo de nuevas características (historias de usuario) para el próximo release. Solo existen en los entornos locales de los desarrolladores y se envían mediante PR a `develop`.
+    *   *Uso:* Desarrollo de nuevas características (historias de usuario) para el próximo release. Local o empujado para PR.
+    *   *🛑 Regla de Limpieza Obligatoria:* Una vez que el Pull Request hacia `develop` es aprobado y fusionado (Merged), **LA RAMA DEBE SER ELIMINADA INMEDIATAMENTE** en el repositorio remoto. ¡Prohibido acumular ramas muertas o de funcionalidades ya cerradas!
     *   *Ejemplo:* `feature/JIRA-123-login-modal`
 
 2.  **`release/` (Entorno de QA y Preparación de Versión):**
@@ -93,7 +135,17 @@ Abre un Pull Request apuntando tu rama `feature/...` hacia la rama **`develop`**
 
 ## 4. Reglas de Integración (Pull Requests y Merge)
 
-1.  **Aprobaciones:** Todo PR debe tener al menos **1 o 2 aprobaciones** ("Approve") antes de poder hacer Merge.
-2.  **CI Checks:** Las pruebas automatizadas (tests) y el pipeline deben pasar.
-3.  **Merge de Features:** Utilizar **"Squash and Merge"** cuando se integre una `feature/` a `develop` para mantener el historial impecable.
-4.  **Merge de Release/Hotfix:** Al cerrar estas ramas, recuerda que deben insertarse tanto en `main` (para crear el Tag de versión) como resolverse de vuelta en `develop` (para que los desarrolladores heredemos el hotfix/ajuste de release).
+Para que una rama sea aceptada en el repositorio remoto, es **obligatorio** someterse a un riguroso proceso de revisión cruzada. El flujo tipo "Pipelines libres directos a main" queda obsoleto bajo estas reglas.
+
+### Sistema de Aprobaciones (Code Review)
+1.  **Mínimo de Revisores:** Todo PR (indistintamente si va dirigido a `develop` o a `main`) requiere obligatoriamente **al menos 2 aprobaciones ("Approve")** de otros desarrolladores antes de habilitarse el botón de Merge.
+2.  **Prohibición de Auto-aprobación:** El creador del Pull Request jamás podrá auto-aprobarse su código. Queda rotundamente prohibido hacer _bypassing_ (saltarse) el flujo de revisión.
+3.  **Code Owners:** En proyectos modulares, si un PR toca código sensible (ej., configuraciones de red, autenticación principal, esquemas de BD), se requerirá la aprobación explícita de un *Tech Lead* o un *Arquitecto* designado (Code Owner del módulo).
+4.  **Resolución de Comentarios ("Changes Requested"):** Si un revisor marca el PR con un estado de "Solicitud de Cambios", el PR queda **bloqueado**. El desarrollador debe hacer nuevos commits respondiendo a los requerimientos y solicitar de nuevo la revisión para remover el bloqueo. No se puede fusionar un PR con comentarios (hilos de charla) o debates sin resolver.
+
+### Filtros Automáticos (CI Checks)
+1.  **Pipeline en Verde:** Las pruebas automatizadas (Unit tests y E2E), el análisis de calidad de código (SonarQube o Linters) y la construcción (Build) deben reportar un estado "Success". Un PR fallando en CI jamás será integrado.
+
+### Estrategias de Fusión (Merge Strategies)
+1.  **Merge de Features:** Se deberá utilizar de forma estricta **"Squash and Merge"** cuando se integre una `feature/` a `develop`. Esto comprime la suciedad del historial (ej., commits tipo "test1", "fix bug rápido") en un solo commit semántico y limpio.
+2.  **Merge de Release/Hotfix:** Estas ramas utilizan _Merge Commits_ estándar (no Squash) debido a que deben integrarse íntegramente de vuelta a `develop` y hacia `main` (para la creación del Tag versionado).

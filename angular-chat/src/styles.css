@@ -81,6 +81,21 @@ body {
     gap: 0.4rem;
 }
 
+.back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+    margin-right: 0.2rem;
+}
+
+.back-btn:hover {
+    color: var(--accent);
+    transform: translateX(-2px);
+}
+
 .badge {
     font-size: 0.7rem;
     padding: 0.1rem 0.4rem;

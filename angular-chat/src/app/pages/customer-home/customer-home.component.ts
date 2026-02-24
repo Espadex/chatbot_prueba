@@ -20,7 +20,14 @@ export class CustomerHomeComponent implements OnInit {
   constructor(private agentService: AgentService) { }
 
   ngOnInit() {
-    this.myAgents = this.agentService.getAgents();
+    this.agentService.getAgents().subscribe({
+      next: (data) => {
+        this.myAgents = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar agentes:', err);
+      }
+    });
   }
 
 }

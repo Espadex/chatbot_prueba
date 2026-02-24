@@ -1,0 +1,107 @@
+[
+    {
+        "id": "alice",
+        "name": "Alice",
+        "initials": "AL",
+        "status": "Online • Practicing JS",
+        "lastSeen": "Now",
+        "unread": 2,
+        "groupId": "group1",
+        "messages": [
+            {
+                "from": "them",
+                "text": "Hey! Ready to practice some JS? 😊",
+                "time": "10:21"
+            },
+            {
+                "from": "me",
+                "text": "Yeah! I'm building a chat UI with HTML/CSS/JS.",
+                "time": "10:22"
+            },
+            {
+                "from": "them",
+                "text": "Nice. No backend needed — just mock the data.",
+                "time": "10:23"
+            }
+        ]
+    },
+    {
+        "id": "mentor",
+        "name": "Mentor Bot",
+        "initials": "MB",
+        "status": "Last seen 2h ago",
+        "lastSeen": "2h",
+        "unread": 0,
+        "groupId": "group1",
+        "messages": [
+            {
+                "from": "them",
+                "text": "Tip: Keep your JS simple first, then refactor.",
+                "time": "08:01"
+            },
+            {
+                "from": "them",
+                "text": "Try separating data (conversations) from DOM logic.",
+                "time": "08:02"
+            }
+        ]
+    },
+    {
+        "id": "notes",
+        "name": "Coding Notes",
+        "initials": "CN",
+        "status": "Pinned • Personal",
+        "lastSeen": "Yesterday",
+        "unread": 3,
+        "groupId": "group1",
+        "messages": [
+            {
+                "from": "me",
+                "text": "• TODO: add localStorage\n• TODO: basic search filter\n• TODO: message timestamps",
+                "time": "21:11"
+            },
+            {
+                "from": "them",
+                "text": "You can also log events to the console while testing.",
+                "time": "21:12"
+            }
+        ]
+    },
+    {
+        "id": "support",
+        "name": "Tech Support",
+        "initials": "TS",
+        "status": "Online",
+        "lastSeen": "Now",
+        "unread": 1,
+        "groupId": "group2",
+        "messages": [
+            {
+                "from": "them",
+                "text": "How can I help you today?",
+                "time": "09:00"
+            }
+        ]
+    },
+    {
+        "id": "billing",
+        "name": "Billing Dept",
+        "initials": "BD",
+        "status": "Away",
+        "lastSeen": "1h",
+        "unread": 0,
+        "groupId": "group2",
+        "messages": [
+            {
+                "from": "me",
+                "text": "I have a question about my invoice.",
+                "time": "14:20"
+            },
+            {
+                "from": "them",
+                "text": "Sure, what's your account number?",
+                "time": "14:25"
+            }
+        ]
+    }
+]
