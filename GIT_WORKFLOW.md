@@ -2,48 +2,6 @@
 
 Este documento define la estrategia de ramas y el flujo de trabajo basándose en el **[modelo estándar GitFlow documentado por Atlassian](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)**, ampliamente adoptado en la industria. Es ideal para proyectos que tienen ciclos de liberación (releases) programados y necesitan mantener una versión de producción estable mientras se desarrolla la siguiente versión.
 
-## 1. Estrategia de Ramas (Branching Strategy)
-
-A continuación, se presenta de forma visual cómo fluye el código entre los distintos entornos y ramas. Puedes visualizar este diagrama en plataformas que soporten **Mermaid** (como GitHub, GitLab, Notion o pegando el código en [Mermaid Live Editor](https://mermaid.live)):
-
-```mermaid
-%%{init: { 'theme': 'base', 'gitGraph': {'mainBranchName': 'main'} } }%%
-gitGraph
-    commit id: "Inicio" tag: "v0.1"
-    
-    branch develop
-    checkout develop
-    commit id: "Configuración inicial"
-
-    branch feature/TKT-123
-    checkout feature/TKT-123
-    commit id: "feat: UI Login"
-    commit id: "feat: Lógica Auth"
-    
-    checkout develop
-    merge feature/TKT-123 id: "Merge a DEV"
-    
-    branch release/v1.0
-    checkout release/v1.0
-    commit id: "fix: bug detectado en QA"
-
-    checkout main
-    merge release/v1.0 tag: "v1.0"
-
-    checkout develop
-    merge release/v1.0 id: "Sync QA a DEV"
-
-    checkout main
-    branch hotfix/crash-prod
-    checkout hotfix/crash-prod
-    commit id: "fix: error crítico en vivo"
-    
-    checkout main
-    merge hotfix/crash-prod tag: "v1.0.1"
-
-    checkout develop
-    merge hotfix/crash-prod id: "Sync Hotfix a DEV"
-```
 
 El repositorio se organiza alrededor de **dos ramas principales permanentes** y **tres tipos de ramas de soporte (efímeras)**.
 

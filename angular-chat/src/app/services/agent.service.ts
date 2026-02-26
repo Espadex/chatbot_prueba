@@ -7,12 +7,13 @@ import { Agent } from '../models/agent';
     providedIn: 'root'
 })
 export class AgentService {
-    // REEMPLAZA esta URL con el enlace de tu Postman o JSON Generator (asegúrate de que apunte al JSON de tus agentes)
-    private apiUrl = 'https://AQUI-VA-TU-URL-DE-POSTMAN/api/agents';
+    // Ya no necesitamos la URL base aquí. El interceptor se encargará de agregarla.
+    // Solo definimos adónde queremos apuntar para "agents"
+    private endpoint = '/agents';
 
     constructor(private http: HttpClient) { }
 
     getAgents(): Observable<Agent[]> {
-        return this.http.get<Agent[]>(this.apiUrl);
+        return this.http.get<Agent[]>(this.endpoint);
     }
 }
