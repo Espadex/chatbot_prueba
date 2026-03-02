@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ChatbotAPI.Models;
 using System.Collections.Generic;
+using System;
 
 namespace ChatbotAPI.Controllers;
 
@@ -9,29 +10,33 @@ namespace ChatbotAPI.Controllers;
 public class AgentsController : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<AgentDto>> Get()
+    public ActionResult<IEnumerable<Agent>> Get()
     {
-        var agents = new List<AgentDto>
+        var agents = new List<Agent>
         {
-            new AgentDto
+            new Agent
             {
-                Id = "chat-mockup",
+                AgentId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                 Name = "Practice Chats",
-                Role = "practice.group",
                 Description = "Your coding practice mockups (Alice, Mentor, Notes).",
-                Status = "Unrestricted",
-                CanEdit = true,
-                Link = "/chat/group1"
+                Model = "gpt-4.1",
+                SystemPrompt = "You are a practice group assistant.",
+                Temperature = 0.7m,
+                MaxTokens = 1000,
+                IsEnabled = true,
+                CreatedAtUtc = DateTime.UtcNow
             },
-            new AgentDto
+            new Agent
             {
-                Id = "support-bots",
+                AgentId = Guid.Parse("00000000-0000-0000-0000-000000000002"),
                 Name = "Support Bots",
-                Role = "service.group",
                 Description = "Customer service bots (Tech Support, Billing).",
-                Status = "Unrestricted",
-                CanEdit = true,
-                Link = "/chat/group2"
+                Model = "gpt-3.5-turbo",
+                SystemPrompt = "You are a customer service assistant.",
+                Temperature = 0.5m,
+                MaxTokens = 500,
+                IsEnabled = true,
+                CreatedAtUtc = DateTime.UtcNow
             }
         };
 

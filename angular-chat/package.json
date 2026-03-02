@@ -6,7 +6,7 @@
     "config-env": "node set-env.js",
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "npm run config-env && ng serve",
-    "start:backend": "dotnet run --project ../ChatbotAPI/ChatbotAPI.csproj",
+    "start:backend": "dotnet watch run --project ../ChatbotAPI/ChatbotAPI.csproj",
     "build": "npm run config-env && ng build",
     "watch": "npm run config-env && ng build --watch --configuration development",
     "test": "ng test"

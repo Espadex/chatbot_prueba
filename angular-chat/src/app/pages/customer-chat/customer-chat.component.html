@@ -21,19 +21,19 @@
             <input type="text" class="search-input" placeholder="Search (visual only)..." />
         </div>
         <div class="chat-list">
-            <div *ngFor="let conv of conversations" class="chat-item" [class.active]="conv.id === activeConversationId"
-                (click)="selectConversation(conv.id)">
-                <div class="avatar">{{ conv.initials }}</div>
+            <div *ngFor="let conv of conversations" class="chat-item"
+                [class.active]="conv.conversationId === activeConversationId"
+                (click)="selectConversation(conv.conversationId)">
+                <div class="avatar">{{ getInitials(conv.title) }}</div>
                 <div class="chat-item-text">
-                    <div class="chat-name">{{ conv.name }}</div>
+                    <div class="chat-name">{{ conv.title }}</div>
                     <div class="chat-last-msg">
-                        {{ conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].text : 'No messages yet'
-                        }}
+                        {{ conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].content : 'No messages
+                        yet' }}
                     </div>
                 </div>
                 <div class="chat-meta">
-                    <div>{{ conv.lastSeen }}</div>
-                    <div *ngIf="conv.unread > 0" class="chat-unread">{{ conv.unread }}</div>
+                    <div>{{ conv.createdAtUtc | date:'shortTime' }}</div>
                 </div>
             </div>
         </div>
@@ -43,14 +43,14 @@
     <main class="chat-main" *ngIf="activeConversation as activeConv">
         <header class="chat-header">
             <div class="chat-header-main">
-                <div class="avatar">{{ activeConv.initials }}</div>
+                <div class="avatar">{{ getInitials(activeConv.title) }}</div>
                 <div class="chat-header-text">
-                    <div class="chat-header-name">{{ activeConv.name }}</div>
+                    <div class="chat-header-name">{{ activeConv.title }}</div>
                     <div class="chat-header-status">{{ activeConv.status }}</div>
                 </div>
             </div>
             <div class="chat-header-right">
-                <span class="pill">Mock thread: {{ activeConv.id }}</span>
+                <span class="pill">Mock thread: {{ activeConv.conversationId }}</span>
                 <span style="font-size: 0.8rem;">No backend 🚫</span>
             </div>
         </header>
@@ -58,10 +58,10 @@
         <section class="messages" #scrollContainer>
             <div class="day-divider">Today</div>
             <div *ngFor="let msg of activeConv.messages" class="message-row"
-                [ngClass]="msg.from === 'me' ? 'me' : 'them'">
+                [ngClass]="msg.role === 'user' ? 'me' : 'them'">
                 <div class="message-bubble">
-                    <div [innerHTML]="msg.text | markdown"></div>
-                    <div class="message-meta">{{ msg.time }}</div>
+                    <div [innerHTML]="msg.content | markdown"></div>
+                    <div class="message-meta">{{ msg.createdAtUtc | date:'shortTime' }}</div>
                 </div>
             </div>
         </section>

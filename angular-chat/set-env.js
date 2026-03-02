@@ -1,8 +1,17 @@
 const fs = require('fs');
+const path = require('path');
 const dotenv = require('dotenv');
 
-// Load environment variables from .env file
-dotenv.config();
+// Construir la ruta absoluta correcta hacia el archivo .env
+const envPath = path.resolve(__dirname, '.env');
+const envConfig = dotenv.config({ path: envPath });
+
+if (envConfig.error) {
+  console.log('⚠️ ADVERTENCIA: No se encontró el archivo .env en la ruta: ' + envPath);
+  console.log('Asegúrate de que no se llame ".env.txt" por error de Windows.');
+} else {
+  console.log('✅ Archivo .env cargado correctamente.');
+}
 
 const isProd = process.env.NODE_ENV === 'production';
 

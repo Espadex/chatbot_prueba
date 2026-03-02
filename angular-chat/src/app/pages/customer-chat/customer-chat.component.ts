@@ -34,7 +34,7 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
   ) { }
 
   get conversations(): Conversation[] {
-    return this.allConversations.filter(c => c.groupId === this.activeGroupId);
+    return this.allConversations.filter(c => c.agentId === this.activeGroupId);
   }
 
   ngOnInit() {
@@ -51,7 +51,7 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
             // Select the first conversation in the group by default after loading
             const groupConversations = this.conversations;
             if (groupConversations.length > 0) {
-              this.selectConversation(groupConversations[0].id);
+              this.selectConversation(groupConversations[0].conversationId);
             } else {
               this.activeConversationId = '';
             }
@@ -62,7 +62,7 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
         // Dynamically get the agent name from the shared service
         this.agentService.getAgents().subscribe({
           next: (agents) => {
-            const agent = agents.find(a => a.link === `/chat/${id}`);
+            const agent = agents.find(a => a.agentId === id);
             if (agent) {
               this.agentName = agent.name;
             } else {
@@ -86,14 +86,14 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
   }
 
   get activeConversation(): Conversation | undefined {
-    return this.allConversations.find(c => c.id === this.activeConversationId && c.groupId === this.activeGroupId);
+    return this.allConversations.find(c => c.conversationId === this.activeConversationId && c.agentId === this.activeGroupId);
   }
 
   selectConversation(id: string) {
     this.activeConversationId = id;
     const conv = this.activeConversation;
     if (conv) {
-      conv.unread = 0;
+      // Unread logic removed since it's not in DB model yet
       this.shouldScroll = true;
     }
   }
@@ -105,12 +105,13 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
     if (!conv) return;
 
     const now = new Date();
-    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     conv.messages.push({
-      from: 'me',
-      text: this.messageInput.trim(),
-      time
+      messageId: crypto.randomUUID(),
+      conversationId: conv.conversationId,
+      role: 'user',
+      content: this.messageInput.trim(),
+      createdAtUtc: now.toISOString()
     });
 
     const userText = this.messageInput;
@@ -120,12 +121,18 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
     setTimeout(() => {
       const replyText = this.createAutoReply(userText);
       conv.messages.push({
-        from: 'them',
-        text: replyText,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        messageId: crypto.randomUUID(),
+        conversationId: conv.conversationId,
+        role: 'assistant',
+        content: replyText,
+        createdAtUtc: new Date().toISOString()
       });
       this.shouldScroll = true;
     }, 1000);
+  }
+
+  getInitials(title: string): string {
+    return title ? title.charAt(0).toUpperCase() : '?';
   }
 
   createAutoReply(text: string): string {

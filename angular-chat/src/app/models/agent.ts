@@ -1,10 +1,11 @@
-
 export interface Agent {
-    id: string;
+    agentId: string;
     name: string;
-    role: string;
     description: string;
-    status: 'Confidential' | 'Unrestricted';
-    canEdit: boolean;
-    link?: string;
+    model: string;
+    systemPrompt: string;
+    temperature: number;
+    maxTokens: number;
+    isEnabled: boolean;
+    createdAtUtc: string;
 }

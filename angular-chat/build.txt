@@ -1,0 +1,11 @@
+[33m???[39m Building...
+[32m???[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m        [2m | [22m[1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mmain-SPMFCFAB.js[39m     [2m | [22m[2mmain[22m         [2m | [22m [36m1.42 MB[39m[2m | [22m              [36m334.21 kB[39m
+[32mpolyfills-FFHMD2TL.js[39m[2m | [22m[2mpolyfills[22m    [2m | [22m[36m34.52 kB[39m[2m | [22m               [36m11.28 kB[39m
+[32mstyles-S2DHTKC4.css[39m  [2m | [22m[2mstyles[22m       [2m | [22m [36m8.77 kB[39m[2m | [22m                [36m2.25 kB[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m[2m | [22m [1m[91m1.47 MB[39m[22m[2m | [22m              [1m347.74 kB[22m
+
+Application bundle generation failed. [3.731 seconds]
+

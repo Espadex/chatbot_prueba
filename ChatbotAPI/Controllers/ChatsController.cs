@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ChatbotAPI.Models;
 using System.Collections.Generic;
+using System;
 
 namespace ChatbotAPI.Controllers;
 
@@ -9,83 +10,82 @@ namespace ChatbotAPI.Controllers;
 public class ChatsController : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<ConversationDto>> Get()
+    public ActionResult<IEnumerable<Conversation>> Get()
     {
-        var chats = new List<ConversationDto>
+        var ownerId1 = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var agentGroup1 = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var agentGroup2 = Guid.Parse("00000000-0000-0000-0000-000000000002");
+
+        var chats = new List<Conversation>
         {
-            new ConversationDto
+            new Conversation
             {
-                Id = "alice",
-                Name = "Alice",
-                Initials = "AL",
+                ConversationId = Guid.Parse("22222222-2222-2222-2222-000000000001"),
+                OwnerUserId = ownerId1,
+                AgentId = agentGroup1,
+                Title = "Alice",
                 Status = "Online • Practicing JS",
-                LastSeen = "Now",
-                Unread = 2,
-                GroupId = "group1",
-                Messages = new List<MessageDto>
+                CreatedAtUtc = DateTime.UtcNow,
+                Messages = new List<Message>
                 {
-                    new MessageDto { From = "them", Text = "Hey! Ready to practice some JS? 😊", Time = "10:21" },
-                    new MessageDto { From = "me", Text = "Yeah! I'm building a chat UI with HTML/CSS/JS.", Time = "10:22" },
-                    new MessageDto { From = "them", Text = "Nice. No backend needed — just mock the data.", Time = "10:23" }
+                    new Message { MessageId = Guid.NewGuid(), Role = "assistant", Content = "Hey! Ready to practice some JS? 😊", CreatedAtUtc = DateTime.UtcNow.AddMinutes(-5) },
+                    new Message { MessageId = Guid.NewGuid(), Role = "user", Content = "Yeah! I'm building a chat UI with HTML/CSS/JS.", CreatedAtUtc = DateTime.UtcNow.AddMinutes(-4) },
+                    new Message { MessageId = Guid.NewGuid(), Role = "assistant", Content = "Nice. No backend needed — just mock the data.", CreatedAtUtc = DateTime.UtcNow.AddMinutes(-3) }
                 }
             },
-            new ConversationDto
+            new Conversation
             {
-                Id = "mentor",
-                Name = "Mentor Bot",
-                Initials = "MB",
+                ConversationId = Guid.Parse("22222222-2222-2222-2222-000000000002"),
+                OwnerUserId = ownerId1,
+                AgentId = agentGroup1,
+                Title = "Mentor Bot",
                 Status = "Last seen 2h ago",
-                LastSeen = "2h",
-                Unread = 0,
-                GroupId = "group1",
-                Messages = new List<MessageDto>
+                CreatedAtUtc = DateTime.UtcNow.AddHours(-2),
+                Messages = new List<Message>
                 {
-                    new MessageDto { From = "them", Text = "Tip: Keep your JS simple first, then refactor.", Time = "08:01" },
-                    new MessageDto { From = "them", Text = "Try separating data (conversations) from DOM logic.", Time = "08:02" }
+                    new Message { MessageId = Guid.NewGuid(), Role = "assistant", Content = "Tip: Keep your JS simple first, then refactor.", CreatedAtUtc = DateTime.UtcNow.AddHours(-2) },
+                    new Message { MessageId = Guid.NewGuid(), Role = "assistant", Content = "Try separating data (conversations) from DOM logic.", CreatedAtUtc = DateTime.UtcNow.AddHours(-1.9) }
                 }
             },
-            new ConversationDto
+            new Conversation
             {
-                Id = "notes",
-                Name = "Coding Notes",
-                Initials = "CN",
+                ConversationId = Guid.Parse("22222222-2222-2222-2222-000000000003"),
+                OwnerUserId = ownerId1,
+                AgentId = agentGroup1,
+                Title = "Coding Notes",
                 Status = "Pinned • Personal",
-                LastSeen = "Yesterday",
-                Unread = 3,
-                GroupId = "group1",
-                Messages = new List<MessageDto>
+                CreatedAtUtc = DateTime.UtcNow.AddDays(-1),
+                Messages = new List<Message>
                 {
-                    new MessageDto { From = "me", Text = "• TODO: add localStorage\n• TODO: basic search filter\n• TODO: message timestamps", Time = "21:11" },
-                    new MessageDto { From = "them", Text = "You can also log events to the console while testing.", Time = "21:12" }
+                    new Message { MessageId = Guid.NewGuid(), Role = "user", Content = "• TODO: add localStorage\n• TODO: basic search filter\n• TODO: message timestamps", CreatedAtUtc = DateTime.UtcNow.AddDays(-1) },
+                    new Message { MessageId = Guid.NewGuid(), Role = "assistant", Content = "You can also log events to the console while testing.", CreatedAtUtc = DateTime.UtcNow.AddDays(-1).AddMinutes(1) }
                 }
             },
-            new ConversationDto
+            new Conversation
             {
-                Id = "support",
-                Name = "Tech Support",
-                Initials = "TS",
+                ConversationId = Guid.Parse("22222222-2222-2222-2222-000000000004"),
+                OwnerUserId = ownerId1,
+                AgentId = agentGroup2,
+                Title = "Tech Support",
                 Status = "Online",
-                LastSeen = "Now",
-                Unread = 1,
-                GroupId = "group2",
-                Messages = new List<MessageDto>
+                CreatedAtUtc = DateTime.UtcNow,
+                Messages = new List<Message>
                 {
-                    new MessageDto { From = "them", Text = "How can I help you today?", Time = "09:00" }
+                    new Message { MessageId = Guid.NewGuid(), Role = "assistant", Content = "How can I help you today?", CreatedAtUtc = DateTime.UtcNow }
                 }
             },
-            new ConversationDto
+            new Conversation
             {
-                Id = "billing",
-                Name = "Billing Dept",
-                Initials = "BD",
+                ConversationId = Guid.Parse("22222222-2222-2222-2222-000000000005"),
+                OwnerUserId = ownerId1,
+                AgentId = agentGroup2,
+                Title = "Billing Dept",
                 Status = "Away",
-                LastSeen = "1h",
-                Unread = 0,
-                GroupId = "group2",
-                Messages = new List<MessageDto>
+                CreatedAtUtc = DateTime.UtcNow.AddHours(-1),
+                Messages = new List<Message>
                 {
-                    new MessageDto { From = "me", Text = "I have a question about my invoice.", Time = "14:20" },
-                    new MessageDto { From = "them", Text = "Sure, what's your account number?", Time = "14:25" }
+                    new Message { MessageId = Guid.NewGuid(), Role = "user", Content = "I have a question about my invoice.", CreatedAtUtc = DateTime.UtcNow.AddHours(-1) },
+                    new Message { MessageId = Guid.NewGuid(), Role = "assistant", Content = "Sure, what's your account number?", CreatedAtUtc = DateTime.UtcNow.AddHours(-0.9) }
                 }
             }
         };

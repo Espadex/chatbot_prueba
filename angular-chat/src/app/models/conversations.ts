@@ -1,16 +1,17 @@
 export interface Message {
-    from: 'me' | 'them';
-    text: string;
-    time: string;
+    messageId: string;
+    conversationId: string;
+    role: string; // 'user' | 'assistant'
+    content: string;
+    createdAtUtc: string;
 }
 
 export interface Conversation {
-    id: string;
-    name: string;
-    initials: string;
+    conversationId: string;
+    ownerUserId: string;
+    agentId: string;
+    title: string;
     status: string;
-    lastSeen: string;
-    unread: number;
-    groupId: string;
+    createdAtUtc: string;
     messages: Message[];
 }
