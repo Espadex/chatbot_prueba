@@ -19,21 +19,55 @@
         </div>
         <div class="sidebar-search">
             <input type="text" class="search-input" placeholder="Search (visual only)..." />
+
+            <button class="create-chat-btn" *ngIf="agentExists" (click)="createNewTemporaryChat()"
+                style="margin-top:0.5rem; width:100%; border-radius:8px; padding:0.5rem; background:var(--accent-gradient); color:white; border:none; cursor:pointer;">
+                + New Chat
+            </button>
         </div>
         <div class="chat-list">
             <div *ngFor="let conv of conversations" class="chat-item"
                 [class.active]="conv.conversationId === activeConversationId"
-                (click)="selectConversation(conv.conversationId)">
+                (click)="selectConversation(conv.conversationId)" style="position:relative;">
                 <div class="avatar">{{ getInitials(conv.title) }}</div>
-                <div class="chat-item-text">
-                    <div class="chat-name">{{ conv.title }}</div>
-                    <div class="chat-last-msg">
-                        {{ conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].content : 'No messages
-                        yet' }}
+
+                <div class="chat-item-text" style="flex:1;">
+                    <!-- Edit Mode -->
+                    <div *ngIf="editingChatId === conv.conversationId" style="display:flex; gap:0.2rem;"
+                        (click)="$event.stopPropagation()">
+                        <input type="text" [(ngModel)]="editingChatTitle"
+                            style="width:100%; background:var(--bg-layer-2); color:white; border:none; border-bottom:1px solid #ccc; outline:none;"
+                            (keydown.enter)="saveRename(conv, $event)">
+                        <button (click)="saveRename(conv, $event)" style="background:none; border:none; cursor:pointer;"
+                            title="Save">✅</button>
+                        <button (click)="cancelRename($event)" style="background:none; border:none; cursor:pointer;"
+                            title="Cancel">❌</button>
                     </div>
-                </div>
-                <div class="chat-meta">
-                    <div>{{ conv.createdAtUtc | date:'shortTime' }}</div>
+
+                    <!-- Read Mode -->
+                    <ng-container *ngIf="editingChatId !== conv.conversationId">
+                        <div class="chat-name" style="display:flex; justify-content:space-between;">
+                            <span>{{ conv.title }}</span>
+                            <!-- 3 Dots menu -->
+                            <span class="dots" style="cursor:pointer;"
+                                (click)="toggleDropdown(conv.conversationId, $event)">⋮</span>
+                        </div>
+                        <div class="chat-last-msg">
+                            {{ conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].content : 'No messages
+                            yet' }}
+                        </div>
+
+                        <!-- Dropdown Options Box -->
+                        <div *ngIf="openDropdownId === conv.conversationId"
+                            style="position:absolute; right:10px; top:30px; background:var(--bg-layer-2); border:1px solid var(--border-color); border-radius:8px; z-index:100; display:flex; flex-direction:column; padding:0.5rem;">
+                            <button (click)="startRenaming(conv, $event)"
+                                style="background:none; border:none; padding:0.5rem; cursor:pointer; color:var(--text-color); text-align:left;">Rename
+                                Chat</button>
+                            <button (click)="deleteChat(conv, $event)"
+                                style="background:none; border:none; padding:0.5rem; cursor:pointer; color:#d76d77; text-align:left;">Delete
+                                Chat</button>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
         </div>
@@ -66,15 +100,27 @@
             </div>
         </section>
 
-        <section class="chat-input-area">
-            <div class="chat-input-container">
-                <input type="text" class="chat-input" placeholder="Type a message and press Enter…"
-                    [(ngModel)]="messageInput" (keydown.enter)="sendMessage()" />
+        <section class="chat-input-area" style="position:relative; display:flex; flex-direction:column;">
+
+            <div *ngIf="isGenerating" style="display:flex; justify-content:center; width:100%; margin-bottom:1rem;">
+                <button class="stop-btn" (click)="stopGenerating()"
+                    style="background:none; border:1px solid var(--border-color); color:var(--text-color); padding:0.5rem 1rem; border-radius:20px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+                    ⏹ Stop generating
+                </button>
             </div>
-            <button class="send-btn" (click)="sendMessage()">
-                <span class="icon">➤</span>
-                <span>Send</span>
-            </button>
+
+            <div style="display:flex; width:100%; gap:0.5rem;">
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" placeholder="Type a message and press Enter…"
+                        [(ngModel)]="messageInput" (keydown.enter)="sendMessage()"
+                        [disabled]="!agentExists || isGenerating" />
+                </div>
+                <button class="send-btn" (click)="sendMessage()"
+                    [disabled]="!agentExists || isGenerating || !messageInput.trim()">
+                    <span class="icon">➤</span>
+                    <span>Send</span>
+                </button>
+            </div>
         </section>
     </main>
 </div>

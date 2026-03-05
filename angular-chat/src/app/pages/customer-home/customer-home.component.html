@@ -7,14 +7,26 @@
             <div class="section-header">
                 <h2>Your Agents</h2>
                 <div class="header-actions">
-                    <span class="view-all">View All</span>
-                    <button class="create-btn">Create Agent</button>
+                    <button class="view-all"
+                        style="background:none; border:none; text-decoration:underline; cursor:pointer;"
+                        (click)="toggleSelectionMode()">
+                        {{ selectionMode ? 'Cancel Selection' : 'Select to Delete' }}
+                    </button>
+                    <button *ngIf="selectionMode" class="btn btn-delete"
+                        style="background-color:#d76d77; color:white; border:none; border-radius:15px; padding:0.5rem 1rem; cursor:pointer;"
+                        (click)="deleteSelectedAgents()" [disabled]="selectedAgentIds.size === 0">
+                        Delete Selected ({{ selectedAgentIds.size }})
+                    </button>
+                    <button *ngIf="!selectionMode" class="create-btn" (click)="openCreateModal()">Create Agent</button>
                 </div>
             </div>
 
             <div class="agents-grid">
                 <!-- Loop through agents -->
-                <app-agent-card *ngFor="let agent of myAgents" [agent]="agent"></app-agent-card>
+                <app-agent-card *ngFor="let agent of myAgents" [agent]="agent" [selectionMode]="selectionMode"
+                    [isSelected]="selectedAgentIds.has(agent.agentId)"
+                    (toggleSelect)="toggleAgentSelection(agent.agentId)">
+                </app-agent-card>
             </div>
         </section>
 
@@ -22,18 +34,51 @@
             <div class="section-header">
                 <h2>Find Agents</h2>
             </div>
-
             <div class="tabs">
                 <button class="tab active">Favorites</button>
                 <button class="tab">Demo</button>
             </div>
-
             <div class="search-bar">
                 <span class="search-icon">🔍</span>
                 <input type="text" placeholder="Search using agent's name, or description..." />
             </div>
-
         </section>
-
     </main>
+</div>
+
+<!-- Simple Create Agent Modal Overlay -->
+<div class="modal-overlay" *ngIf="showCreateModal"
+    style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:9999;">
+    <div class="modal-content"
+        style="background:var(--bg-layer-2); padding:2rem; border-radius:15px; width:400px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom:1rem;">Create New Agent</h3>
+
+        <div style="margin-bottom:1rem;">
+            <label style="display:block; margin-bottom:0.5rem;">Agent Name *</label>
+            <input type="text" [(ngModel)]="newAgent.name"
+                style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-layer-1); color:var(--text-color);" />
+        </div>
+
+        <div style="margin-bottom:1rem;">
+            <label style="display:block; margin-bottom:0.5rem;">Description</label>
+            <input type="text" [(ngModel)]="newAgent.description"
+                style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-layer-1); color:var(--text-color);" />
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+            <label style="display:block; margin-bottom:0.5rem; color: #888;">System Prompt (Coming Soon)</label>
+            <textarea [(ngModel)]="newAgent.systemPrompt" disabled
+                style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-layer-1); color:var(--text-color); opacity: 0.5; resize:none;"
+                rows="3" placeholder="You are a helpful assistant..."></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:1rem;">
+            <button
+                style="padding:0.5rem 1rem; border-radius:8px; cursor:pointer; background:none; border:1px solid var(--text-color); color:var(--text-color);"
+                (click)="closeCreateModal()">Cancel</button>
+            <button
+                style="padding:0.5rem 1rem; border-radius:8px; cursor:pointer; background:var(--accent-gradient); color:#fff; border:none;"
+                [disabled]="!newAgent.name" (click)="createNewAgent()">Create</button>
+        </div>
+    </div>
 </div>

@@ -23,7 +23,17 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
   activeGroupId = ''; // Track which group of chats is currently active
   messageInput = '';
   shouldScroll = false;
-  agentName = 'Chat Mockup';
+  agentName = 'Unknown Agent';
+  agentExists = true;
+
+  // Generation details
+  isGenerating = false;
+  generationTimeoutId: any = null;
+
+  // Dropdown menu state
+  openDropdownId: string | null = null;
+  editingChatId: string | null = null;
+  editingChatTitle = '';
 
   allConversations: Conversation[] = [];
 
@@ -43,17 +53,19 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
       if (id) {
         this.activeGroupId = id;
 
-        // Fetch conversations from the mock backend
-        this.chatService.getConversations().subscribe({
+        // Fetch conversations from the mock backend passing the agentId
+        this.chatService.getConversations(id).subscribe({
           next: (data) => {
             this.allConversations = data;
 
-            // Select the first conversation in the group by default after loading
-            const groupConversations = this.conversations;
-            if (groupConversations.length > 0) {
-              this.selectConversation(groupConversations[0].conversationId);
-            } else {
-              this.activeConversationId = '';
+            // Don't auto-select if we just created a new Temporary chat
+            if (!this.activeConversationId || !this.allConversations.find(c => c.conversationId === this.activeConversationId)) {
+              const groupConversations = this.conversations;
+              if (groupConversations.length > 0) {
+                this.selectConversation(groupConversations[0].conversationId);
+              } else {
+                this.activeConversationId = '';
+              }
             }
           },
           error: (err) => console.error('Error loading conversations:', err)
@@ -65,13 +77,16 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
             const agent = agents.find(a => a.agentId === id);
             if (agent) {
               this.agentName = agent.name;
+              this.agentExists = true;
             } else {
-              this.agentName = 'Chat Mockup';
+              this.agentName = 'Unknown Agent';
+              this.agentExists = false;
             }
           },
           error: (err) => {
             console.error('Error al cargar agentes:', err);
-            this.agentName = 'Chat Mockup';
+            this.agentName = 'Unknown Agent';
+            this.agentExists = false;
           }
         });
       }
@@ -98,37 +113,152 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
     }
   }
 
+  createNewTemporaryChat() {
+    const newConv: Conversation = {
+      conversationId: `temp-${Date.now()}`,
+      ownerUserId: 'mock-user-id',
+      agentId: this.activeGroupId,
+      title: 'New Chat',
+      status: 'Online',
+      createdAtUtc: new Date().toISOString(),
+      messages: []
+    };
+    this.allConversations.unshift(newConv);
+    this.selectConversation(newConv.conversationId);
+    this.closeDropdowns();
+  }
+
   sendMessage() {
-    if (!this.messageInput.trim()) return;
+    if (!this.messageInput.trim() || this.isGenerating) return;
 
     const conv = this.activeConversation;
     if (!conv) return;
 
-    const now = new Date();
+    const userText = this.messageInput.trim();
+    this.messageInput = '';
 
-    conv.messages.push({
+    // Si es un chat temporal, lo volvemos "real" y le ponemos nombre
+    if (conv.conversationId.startsWith('temp-')) {
+      conv.conversationId = crypto.randomUUID();
+      conv.title = userText; // El nombre por defecto es el primer mensaje
+
+      // Simular POST a /api/conversations
+      this.chatService.createConversation(conv).subscribe({
+        next: () => console.log('Chat Guardado'),
+        error: (err) => console.log('Mock fallback saving chat') // ignorar error falso
+      });
+    }
+
+    // Agregar mensaje del usuario
+    const userMsg = {
       messageId: crypto.randomUUID(),
       conversationId: conv.conversationId,
       role: 'user',
-      content: this.messageInput.trim(),
-      createdAtUtc: now.toISOString()
+      content: userText,
+      createdAtUtc: new Date().toISOString()
+    };
+    conv.messages.push(userMsg);
+
+    // Mandar el mensaje al backend
+    this.chatService.sendMessage(conv.conversationId, userMsg).subscribe({
+      next: () => { }, error: () => { }
     });
 
-    const userText = this.messageInput;
-    this.messageInput = '';
     this.shouldScroll = true;
+    this.isGenerating = true;
 
-    setTimeout(() => {
+    // Simular que el agente escribe
+    this.generationTimeoutId = setTimeout(() => {
       const replyText = this.createAutoReply(userText);
-      conv.messages.push({
+      const botMsg = {
         messageId: crypto.randomUUID(),
         conversationId: conv.conversationId,
         role: 'assistant',
         content: replyText,
         createdAtUtc: new Date().toISOString()
+      };
+
+      conv.messages.push(botMsg);
+      this.chatService.sendMessage(conv.conversationId, botMsg).subscribe({
+        next: () => { }, error: () => { }
       });
+
+      this.isGenerating = false;
       this.shouldScroll = true;
-    }, 1000);
+    }, 2000);
+  }
+
+  stopGenerating() {
+    if (this.generationTimeoutId) {
+      clearTimeout(this.generationTimeoutId);
+      this.isGenerating = false;
+
+      // Añadimos mensaje visual de cancelación (Mock)
+      const conv = this.activeConversation;
+      if (conv) {
+        conv.messages.push({
+          messageId: crypto.randomUUID(),
+          conversationId: conv.conversationId,
+          role: 'assistant',
+          content: '*(Generación detenida por el usuario)*',
+          createdAtUtc: new Date().toISOString()
+        });
+        this.shouldScroll = true;
+      }
+    }
+  }
+
+  toggleDropdown(id: string, event: Event) {
+    event.stopPropagation();
+    if (this.openDropdownId === id) this.openDropdownId = null;
+    else this.openDropdownId = id;
+  }
+
+  closeDropdowns() {
+    this.openDropdownId = null;
+  }
+
+  // Renaming Logic
+  startRenaming(conv: Conversation, event: Event) {
+    event.stopPropagation();
+    this.editingChatId = conv.conversationId;
+    this.editingChatTitle = conv.title;
+    this.closeDropdowns();
+  }
+
+  saveRename(conv: Conversation, event: Event) {
+    event.stopPropagation();
+    const newTitle = this.editingChatTitle.trim();
+    if (newTitle && newTitle !== conv.title) {
+      conv.title = newTitle;
+      this.chatService.renameConversation(conv.conversationId, newTitle).subscribe({
+        next: () => { }, error: () => { }
+      });
+    }
+    this.cancelRename(event);
+  }
+
+  cancelRename(event?: Event) {
+    if (event) event.stopPropagation();
+    this.editingChatId = null;
+    this.editingChatTitle = '';
+  }
+
+  // Deletion logic
+  deleteChat(conv: Conversation, event: Event) {
+    event.stopPropagation();
+    this.chatService.deleteConversation(conv.conversationId).subscribe({
+      next: () => {
+        this.allConversations = this.allConversations.filter(c => c.conversationId !== conv.conversationId);
+        if (this.activeConversationId === conv.conversationId) this.activeConversationId = '';
+      },
+      error: () => {
+        // Fallback en mock
+        this.allConversations = this.allConversations.filter(c => c.conversationId !== conv.conversationId);
+        if (this.activeConversationId === conv.conversationId) this.activeConversationId = '';
+      }
+    });
+    this.closeDropdowns();
   }
 
   getInitials(title: string): string {
@@ -168,7 +298,14 @@ export class CustomerChatComponent implements AfterViewChecked, OnInit {
   }
 
   @HostListener('click', ['$event'])
-  onChatClick(event: MouseEvent) {
+  onGlobalClick(event: MouseEvent) {
+    if (this.openDropdownId) {
+      this.closeDropdowns();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     const copyBtn = target.closest('.copy-btn') as HTMLElement;
 

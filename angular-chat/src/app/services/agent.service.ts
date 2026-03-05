@@ -16,4 +16,12 @@ export class AgentService {
     getAgents(): Observable<Agent[]> {
         return this.http.get<Agent[]>(this.endpoint);
     }
+
+    createAgent(agent: Partial<Agent>): Observable<Agent> {
+        return this.http.post<Agent>(this.endpoint, agent);
+    }
+
+    deleteAgent(agentId: string): Observable<any> {
+        return this.http.delete(`${this.endpoint}/${agentId}`);
+    }
 }

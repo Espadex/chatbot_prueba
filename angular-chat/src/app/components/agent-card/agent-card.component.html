@@ -1,4 +1,11 @@
-<div class="agent-card" *ngIf="agent">
+<div class="agent-card" *ngIf="agent" (click)="onToggle($event)" [class.selection-active]="selectionMode"
+    [style.border]="isSelected ? '2px solid #38ef7d' : ''">
+
+    <div *ngIf="selectionMode" class="checkbox-container" style="position:absolute; top:10px; right:10px; z-index:2;">
+        <input type="checkbox" [checked]="isSelected" style="transform: scale(1.5); cursor: pointer;"
+            (change)="onToggle($event)" />
+    </div>
+
     <div class="card-header">
         <div class="agent-icon">
             <span *ngIf="agent.name === 'Practice Chats'">💬</span>
@@ -18,9 +25,11 @@
         </span>
         <div class="card-actions">
             <!-- Dynamically link to chat view by agentId -->
-            <a [routerLink]="['/chat', agent.agentId]" class="btn btn-try">Try</a>
+            <a *ngIf="!selectionMode" [routerLink]="['/chat', agent.agentId]" class="btn btn-try">Try</a>
+            <button *ngIf="selectionMode" class="btn btn-try" disabled style="opacity:0.5;">Try</button>
 
-            <button class="btn btn-edit">Edit</button>
+            <button class="btn btn-edit" [disabled]="selectionMode"
+                [style.opacity]="selectionMode ? '0.5' : '1'">Edit</button>
         </div>
     </div>
 </div>

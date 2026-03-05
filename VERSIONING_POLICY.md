@@ -16,10 +16,10 @@ El formato de versión es **`MAJOR.MINOR.PATCH`** (ej. `2.14.3`):
 El ciclo de versionado y la creación de etiquetas (Tags, ej. `v1.0.0`) ocurren de acuerdo con nuestra estrategia oficial de ramas dictaminada por el modelo GitFlow:
 
 *   **Rama `main` (Producción):** Es la fuente de la verdad para ambientes vivos. Las versiones estables habitan y se etiquetan exclusivamente aquí. 
-    *   **Incremento `MINOR` o `MAJOR`:** Ocurre cuando se fusiona una rama de preparación de `release/` hacia la rama `main` (ej. se cierra un ciclo de entrega completo).
+    *   **Incremento `MINOR` o `MAJOR`:** Ocurre cuando se fusiona una rama de preparación de `stagging/` hacia la rama `main` (ej. se cierra un ciclo de entrega completo).
     *   **Incremento `PATCH`:** Ocurre únicamente cuando se interviene producción por una falla y se fusiona desde una rama de corrección `hotfix/` directo hacia la rama `main`.
 *   **Rama `develop` (Integración):** Representa el código en construcción que saldrá en la *próxima* versión `MINOR` o `MAJOR`. Aglomera las nuevas funcionalidades y puede emitir versiones preliminares en ambientes de Pruebas o QA (ej. `-alpha` o `-beta`).
-*   **Ramas de Soporte (`feature/`):** Usan versiones efímeras o _pre-release_ automáticas dependientes del nombre de la rama para generar builds temporales aislados (ej. `1.5.0-feature-login.1`), logrando pruebas de integración continua (CI) sin obstruir versiones oficiales.
+*   **Ramas de Soporte (`feature/`):** Usan versiones efímeras o _pre-stagging_ automáticas dependientes del nombre de la rama para generar builds temporales aislados (ej. `1.5.0-feature-login.1`), logrando pruebas de integración continua (CI) sin obstruir versiones oficiales.
 
 > 💡 **Nota:** Para conocer las reglas exactas sobre cómo estructurar los mensajes de commit para la automatización, y el tutorial paso a paso sobre el manejo de ramas, consulta el documento **[Flujo de Trabajo de Git](./GIT_WORKFLOW.md)**.
 
